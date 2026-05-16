@@ -2,69 +2,184 @@
 <html lang="it">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <meta name="theme-color" content="#0b1220" />
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#A3B18A" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  ./manifest.webmanifest
   <title>IronAmbra</title>
-
-  
-./manifest.webmanifest
-icon-192.png
-  
-<meta name="theme-color" content="#0b1220">
 
   <style>
     :root{
-      --bg:#0b1220; --card:#111a2e; --muted:#9fb0d0; --text:#eaf0ff;
-      --accent:#7c5cff; --ok:#16a34a; --danger:#ef4444;
-      --border:rgba(255,255,255,.10);
+      /* palette (iPhone) */
+      --sage:#A3B18A;           /* header verde salvia */
+      --sage-dark:#8FA37A;
+      --bg:#EEF1EE;             /* sfondo grigio chiarissimo */
+      --card:#F8FAF8;           /* card più chiara dello sfondo */
+      --panel:#FFFFFF;          /* aree input bianche */
+      --text:#101828;
+      --muted:#5F6B65;
+      --border:rgba(16,24,40,.12);
+      --accent:#6C63FF;
+      --ok:#16a34a;
+      --danger:#ef4444;
+      --shadow:0 6px 18px rgba(16,24,40,.08);
+      --radius:18px;
     }
-    @media (prefers-color-scheme: light){
-      :root{ --bg:#f6f7fb; --card:#ffffff; --muted:#5b6b86; --text:#0b1220; --border:rgba(0,0,0,.10); }
+
+    body{
+      margin:0;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,Arial;
+      background:var(--bg);
+      color:var(--text);
+      -webkit-text-size-adjust:100%;
     }
-    body{ margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,Arial; background:var(--bg); color:var(--text); }
-    header{ position:sticky; top:0; z-index:10; padding:14px 16px; border-bottom:1px solid var(--border);
-      background:rgba(11,18,32,.75); backdrop-filter: blur(10px); }
+
+    header{
+      position:sticky; top:0; z-index:20;
+      padding: calc(10px + env(safe-area-inset-top)) 16px 12px 16px;
+      background: linear-gradient(180deg, var(--sage), var(--sage-dark));
+      color:#0b1220;
+      box-shadow: var(--shadow);
+    }
+
     h1{ margin:0; font-size:18px; letter-spacing:.2px; display:flex; align-items:center; gap:10px; }
-    .pill{ font-size:12px; padding:4px 8px; border:1px solid var(--border); border-radius:999px; color:var(--muted); }
-    main{ padding:16px; max-width:980px; margin:0 auto; }
-    .tabs{ display:flex; gap:8px; flex-wrap:wrap; margin:12px 0 16px; }
-    .tab{ padding:10px 12px; border:1px solid var(--border); border-radius:12px; background:transparent; color:var(--text); }
-    .tab.active{ background:var(--card); border-color:rgba(124,92,255,.55); }
+    .pill{
+      font-size:12px; padding:4px 10px; border-radius:999px;
+      background:rgba(255,255,255,.45);
+      border:1px solid rgba(255,255,255,.55);
+      color:#0b1220;
+    }
+
+    main{ padding:14px 14px calc(18px + env(safe-area-inset-bottom)) 14px; max-width:980px; margin:0 auto; }
+
+    /* Tabs in orizzontale, mai sovrapposti */
+    .tabs{
+      display:flex;
+      gap:10px;
+      flex-wrap:nowrap;
+      overflow-x:auto;
+      -webkit-overflow-scrolling:touch;
+      padding:10px 2px 12px 2px;
+    }
+    .tab{
+      flex:0 0 auto;
+      white-space:nowrap;
+      padding:10px 14px;
+      border-radius:999px;
+      border:1px solid var(--border);
+      background:rgba(255,255,255,.65);
+      color:var(--text);
+      font-weight:600;
+    }
+    .tab.active{
+      background:var(--panel);
+      border-color:rgba(108,99,255,.35);
+      outline: 3px solid rgba(108,99,255,.10);
+    }
+
     .grid{ display:grid; gap:12px; }
-    .card{ background:var(--card); border:1px solid var(--border); border-radius:16px; padding:14px; }
+
+    .card{
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      padding:14px;
+      box-shadow: 0 2px 0 rgba(16,24,40,.02);
+    }
+
     .row{ display:flex; gap:10px; align-items:center; justify-content:space-between; flex-wrap:wrap; }
     .muted{ color:var(--muted); font-size:13px; }
-    .btn{ border:1px solid var(--border); background:transparent; color:var(--text); padding:10px 12px; border-radius:12px; }
-    .btn.primary{ background:var(--accent); border-color:rgba(124,92,255,.7); }
-    .btn.ok{ background:var(--ok); border-color:rgba(22,163,74,.7); }
-    .btn.danger{ background:var(--danger); border-color:rgba(239,68,68,.7); }
-    input, select, textarea{
-      width:100%; padding:10px 10px; border-radius:12px;
-      border:1px solid var(--border); background:transparent; color:var(--text);
-      outline:none;
+
+    .btn{
+      border:1px solid var(--border);
+      background:rgba(255,255,255,.8);
+      color:var(--text);
+      padding:10px 12px;
+      border-radius:14px;
+      font-weight:700;
     }
-    textarea{ min-height:110px; }
-    label{ font-size:12px; color:var(--muted); display:block; margin-bottom:6px; }
-    .exercise{ padding:12px; border-radius:14px; border:1px solid var(--border); background:rgba(0,0,0,.06); }
-    .exercise h3{ margin:0 0 8px; font-size:15px; }
+    .btn.primary{ background:var(--accent); color:white; border-color:rgba(108,99,255,.5); }
+    .btn.ok{ background:var(--ok); color:white; border-color:rgba(22,163,74,.5); }
+    .btn.danger{ background:var(--danger); color:white; border-color:rgba(239,68,68,.55); }
+    .btn:active{ transform: translateY(1px); }
+
+    /* INPUT BIANCHI su SFONDO GRIGIO */
+    input, select, textarea{
+      width:100%;
+      padding:12px 12px;
+      border-radius:14px;
+      border:1px solid var(--border);
+      background:var(--panel);
+      color:var(--text);
+      outline:none;
+      box-sizing:border-box;
+    }
+    input::placeholder, textarea::placeholder{ color:#98A2B3; }
+    textarea{ min-height:112px; resize:vertical; }
+    label{ font-size:12px; color:var(--muted); display:block; margin-bottom:6px; font-weight:700; }
+
+    /* Esercizi: niente sovrapposizioni */
+    .exercise{
+      padding:12px;
+      border-radius:16px;
+      border:1px solid var(--border);
+      background:rgba(255,255,255,.70);
+    }
+    .exercise h3{ margin:0 0 6px; font-size:15px; }
     .exercise small{ color:var(--muted); }
-    .cols{ display:grid; grid-template-columns: 1fr 1fr; gap:10px; }
-    .cols3{ display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px; }
+    .spacer{ height:8px; }
     .check{ display:flex; gap:10px; align-items:center; }
     .check input{ width:20px; height:20px; }
-    .timerBig{ font-size:38px; font-weight:800; letter-spacing:.5px; }
-    canvas{ width:100% !important; height:220px !important; }
-    .spacer{ height:8px; }
-    .hint{ padding:10px 12px; border-radius:14px; border:1px dashed var(--border); color:var(--muted); font-size:13px; }
+
+    .cols{ display:grid; grid-template-columns: 1fr 1fr; gap:10px; }
+    .cols3{ display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px; }
+
+    /* iPhone (schermi stretti): 3 colonne -> 1 colonna, 2 colonne -> 1 */
+    @media (max-width: 430px){
+      .cols, .cols3{ grid-template-columns: 1fr; }
+      .row{ align-items:flex-start; }
+    }
+
+    .timerBig{ font-size:40px; font-weight:900; letter-spacing:.5px; }
+
+    .hint{
+      padding:10px 12px;
+      border-radius:16px;
+      border:1px dashed rgba(16,24,40,.18);
+      background:rgba(255,255,255,.6);
+      color:var(--muted);
+      font-size:13px;
+    }
+
+    .badge{
+      display:inline-flex; align-items:center; gap:6px;
+      padding:4px 10px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:800;
+      border:1px solid rgba(16,24,40,.10);
+      background:rgba(255,255,255,.75);
+      color:var(--text);
+    }
+    .badge.note{ border-color:rgba(245,158,11,.35); background:rgba(245,158,11,.12); }
+
+    canvas{ width:100% !important; height:220px !important; background:#fff; border-radius:14px; border:1px solid var(--border); }
+
+    /* “Nascondi” eventuale testo tecnico: stesso colore dello sfondo + piccolissimo */
+    .dev-ghost{
+      color: var(--bg) !important;
+      font-size: 1px !important;
+      line-height: 1px !important;
+      user-select:none;
+    }
   </style>
 </head>
 
 <body>
 <header>
   <div class="row">
-    <h1>IronAmbra <span class="pill">offline • PWA</span></h1>
+    <h1>IronAmbra <span class="pill" id="netPill">—</span></h1>
     <button class="btn" id="installHintBtn" title="Installazione">📲</button>
   </div>
 </header>
@@ -85,7 +200,7 @@ icon-192.png
       <div class="row">
         <div>
           <div class="muted">Oggi</div>
-          <div style="font-size:18px;font-weight:800" id="todayLabel">Mobilità + Day 1</div>
+          <div style="font-size:18px;font-weight:900" id="todayLabel">Mobilità + Day 1</div>
           <div class="muted">Scegli cosa fare e premi “Inizia workout”.</div>
         </div>
         <div style="min-width:180px">
@@ -104,7 +219,7 @@ icon-192.png
     <div class="card">
       <div class="row">
         <div>
-          <div style="font-weight:800">Ultimo allenamento</div>
+          <div style="font-weight:900">Ultimo allenamento</div>
           <div class="muted" id="lastWorkout">Nessuno ancora</div>
         </div>
         <button class="btn" id="exportBtn">⬇️ Export CSV</button>
@@ -122,7 +237,7 @@ icon-192.png
       <div class="row">
         <div>
           <div class="muted">Sessione attiva</div>
-          <div style="font-size:18px;font-weight:900" id="sessionTitle">—</div>
+          <div style="font-size:18px;font-weight:950" id="sessionTitle">—</div>
           <div class="muted" id="sessionMeta">—</div>
         </div>
         <div class="row" style="gap:8px">
@@ -152,7 +267,7 @@ icon-192.png
         </div>
       </div>
       <div class="spacer"></div>
-      <div class="muted">Calorie stimate (MET): è una stima, non un dato clinico.</div>
+      <div class="muted">Calorie stimate (MET): è una stima.</div>
     </div>
 
     <div id="exerciseList" class="grid"></div>
@@ -180,7 +295,7 @@ icon-192.png
         <button class="btn" data-set="120">120s</button>
       </div>
       <div class="spacer"></div>
-      <div class="hint">Su iPhone: suono + notifica (se permessa). Vibrazione web non sempre garantita.</div>
+      <div class="hint">Su iPhone: suono + notifica (se permessa).</div>
     </div>
   </section>
 
@@ -189,11 +304,13 @@ icon-192.png
     <div class="card">
       <div class="row">
         <div>
-          <div style="font-weight:900;font-size:18px">Storico & Progressi</div>
+          <div style="font-weight:950;font-size:18px">Storico & Progressi</div>
           <div class="muted">Grafico carichi + sessioni completate.</div>
         </div>
         <button class="btn" id="exportPdfBtn">🧾 Export PDF</button>
       </div>
+      <div class="spacer"></div>
+      <div class="muted" id="libStatus">—</div>
     </div>
 
     <div class="card">
@@ -201,18 +318,15 @@ icon-192.png
       <select id="chartExercise"></select>
       <div class="spacer"></div>
       <canvas id="weightChart"></canvas>
-      <div class="muted" id="chartWarn" style="margin-top:8px; display:none;">
-        Grafico non disponibile offline al primo avvio: apri IronAmbra una volta con internet.
-      </div>
     </div>
 
     <div class="card">
-      <div style="font-weight:800">Allenamenti completati</div>
+      <div style="font-weight:900">Allenamenti completati</div>
       <div class="muted" id="statsLine">—</div>
     </div>
 
     <div class="card">
-      <div style="font-weight:800">Lista sessioni</div>
+      <div style="font-weight:900">Lista sessioni</div>
       <div class="spacer"></div>
       <div id="sessionList" class="grid"></div>
     </div>
@@ -221,17 +335,17 @@ icon-192.png
   <!-- IMPORTA -->
   <section id="importa" class="grid" style="display:none">
     <div class="card">
-      <div style="font-weight:900;font-size:18px">Importa scheda (da testo)</div>
-      <div class="muted">Formato: “Squat trx 4x10” — “Affondo trx 4x6-6”.</div>
+      <div style="font-weight:950;font-size:18px">Importa scheda (da testo)</div>
+      <div class="muted">Formato: “RDL 4x10” — “Step up 4x6-6”.</div>
       <div class="spacer"></div>
       <label>Nome workout</label>
       <input id="importName" placeholder="es. Day 2" />
       <div class="spacer"></div>
       <label>Testo incollato</label>
       <textarea id="importText" placeholder="Esempio:
-Squat trx 4x10
-Affondo trx 4x6-6
-Push up 3x8"></textarea>
+RDL 4x10
+Step up 4x6-6
+Chest press 4x8"></textarea>
       <div class="spacer"></div>
       <button class="btn primary" id="importBtn">✨ Crea workout</button>
     </div>
@@ -240,7 +354,7 @@ Push up 3x8"></textarea>
   <!-- IMPOSTAZIONI -->
   <section id="impostazioni" class="grid" style="display:none">
     <div class="card">
-      <div style="font-weight:900;font-size:18px">Impostazioni</div>
+      <div style="font-weight:950;font-size:18px">Impostazioni</div>
       <div class="spacer"></div>
       <label>MET per calcolo calorie (forza)</label>
       <select id="metSelect">
@@ -253,22 +367,32 @@ Push up 3x8"></textarea>
       <div class="spacer"></div>
       <button class="btn danger" id="resetAll">🗑️ Reset totale (cancella dati)</button>
       <div class="spacer"></div>
-      <div class="hint">Dati salvati solo sul tuo iPhone (localStorage). Cloud/login = fase 2.</div>
+      <button class="btn" id="hardRefresh">♻️ Aggiorna app (fix cache)</button>
+      <div class="spacer"></div>
+      <div class="hint">Se vedi ancora cose vecchie: premi “Aggiorna app (fix cache)”.</div>
     </div>
   </section>
+
+  <!-- (se per qualche motivo appare qualcosa tecnico, lo rendiamo invisibile) -->
+  <div class="dev-ghost" id="ghost"></div>
 </main>
 
-<!-- Librerie (servono per grafici e PDF) -->
+<!-- LIB: stavolta sono SCRIPT REALI (non testo), quindi NON compariranno in nero in basso -->
 https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.jsscript>
 https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.jsscript>
 
 <script>
-/* -----------------------
-   IronAmbra - Offline PWA
-   ----------------------- */
+/* -------------------------
+   IronAmbra - iPhone first
+   ------------------------- */
 
-const STORAGE_KEY = "ironambra_v1";
+const STORAGE_KEY = "ironambra_v2";
 const state = loadState() ?? seedState();
+
+const LIBS = {
+  chart: "https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js",
+  pdf:   "https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"
+};
 
 function seedState(){
   return {
@@ -290,7 +414,7 @@ function seedState(){
         mkEx("Curl manubri", 3, "10"),
         mkEx("Plank-crunch", 3, "20\"-20"),
       ],
-            "Day 2": [
+      "Day 2": [
         mkEx("RDL", 4, "10"),
         mkEx("Step up", 4, "6-6"),
         mkEx("Leg curl", 3, "10"),
@@ -314,12 +438,9 @@ function seedState(){
   };
 }
 
-function mkEx(name, sets, reps){
-  return { id: cryptoId(), name, targetSets: sets, targetReps: reps, rest: 90 };
-}
-function cryptoId(){
-  return (crypto?.randomUUID?.() ?? ("id_"+Math.random().toString(16).slice(2)));
-}
+function mkEx(name, sets, reps){ return { id: cryptoId(), name, targetSets: sets, targetReps: reps, rest: 90 }; }
+function cryptoId(){ return (crypto?.randomUUID?.() ?? ("id_"+Math.random().toString(16).slice(2))); }
+
 function saveState(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
 function loadState(){ try{ return JSON.parse(localStorage.getItem(STORAGE_KEY)); }catch(e){ return null; } }
 
@@ -332,6 +453,16 @@ function calcCalories(met, kg, minutes){
   return Math.round((met * 3.5 * kg / 200) * minutes);
 }
 
+/* Network pill */
+const netPill = document.getElementById("netPill");
+function refreshNet(){
+  const online = navigator.onLine;
+  netPill.textContent = online ? "online • PWA" : "offline • PWA";
+}
+window.addEventListener("online", refreshNet);
+window.addEventListener("offline", refreshNet);
+refreshNet();
+
 /* Tabs */
 const tabs = document.querySelectorAll(".tab");
 tabs.forEach(b=>b.addEventListener("click", ()=>{
@@ -340,8 +471,8 @@ tabs.forEach(b=>b.addEventListener("click", ()=>{
   const t=b.dataset.tab;
   document.querySelectorAll("main section").forEach(s=>s.style.display="none");
   document.getElementById(t).style.display="grid";
-  if(t==="storico") renderStorico();
-  if(t==="home") renderHome();
+  if(t==="storico") { renderStorico(); }
+  if(t==="home") { renderHome(); }
 }));
 
 function openTab(name){
@@ -362,11 +493,14 @@ function renderHome(){
     opt.value=k; opt.textContent=k;
     todaySelect.appendChild(opt);
   });
-  todaySelect.value = "Day 1";
+  if(!todaySelect.value) todaySelect.value = "Day 1";
   todayLabel.textContent = "Mobilità + " + todaySelect.value;
 
   const last = state.sessions.at(-1);
-  lastWorkout.textContent = last ? `${last.planName} • ${fmtDate(last.finishedAt)} • kcal: ${last.calories ?? "—"}` : "Nessuno ancora";
+  lastWorkout.textContent = last
+    ? `${last.planName} • ${fmtDate(last.finishedAt)} • kcal: ${last.calories ?? "—"}${last.hasNotes ? " • 📝 note" : ""}`
+    : "Nessuno ancora";
+
   saveState();
 }
 todaySelect.addEventListener("change", ()=> todayLabel.textContent = "Mobilità + " + todaySelect.value);
@@ -425,7 +559,7 @@ function renderWorkout(){
     card.className="exercise";
     card.innerHTML = `
       <div class="row">
-        <div>
+        <div style="min-width: 180px; max-width: 100%;">
           <h3>${e.name}</h3>
           <small>Target: ${e.targetSets} × ${e.targetReps} • Recupero: ${e.rest || s.restDefault || 90}s</small>
         </div>
@@ -473,6 +607,7 @@ function renderWorkout(){
     const plusRestBtn = card.querySelector('button[data-plusrest]');
 
     chk.addEventListener("change", ()=>{ e.done = chk.checked; saveState(); });
+
     inputs[0].addEventListener("input", ()=>{ e.kg = inputs[0].value; saveState(); });
     inputs[1].addEventListener("input", ()=>{ e.setsDone = Number(inputs[1].value||0); saveState(); });
     inputs[2].addEventListener("input", ()=>{ e.repsDone = inputs[2].value; saveState(); });
@@ -506,9 +641,14 @@ document.getElementById("saveSessionBtn").addEventListener("click", ()=>{ saveSt
 document.getElementById("finishSessionBtn").addEventListener("click", ()=>{
   const s = state.activeSession;
   if(!s) return;
+
   s.finishedAt = Date.now();
   const met = Number(state.settings.met || 5.0);
   s.calories = calcCalories(met, s.bodyweight, s.durationMin);
+
+  // ✅ evidenzia se in quel work day hai messo NOTE
+  s.hasNotes = s.exercises.some(ex => (ex.notes || "").trim().length > 0);
+
   state.sessions.push(s);
   state.activeSession = null;
   saveState();
@@ -572,17 +712,49 @@ function beep(){
     o.type="sine"; o.frequency.value=880;
     o.connect(g); g.connect(ctx.destination);
     g.gain.setValueAtTime(0.001, ctx.currentTime);
-    g.gain.exponentialRampToValueAtTime(0.25, ctx.currentTime + 0.02);
+    g.gain.exponentialRampToValueAtTime(0.20, ctx.currentTime + 0.02);
     o.start();
-    setTimeout(()=>{ g.gain.exponentialRampToToValueAtTime?.(0.001, ctx.currentTime + 0.05); o.stop(ctx.currentTime + 0.06); }, 450);
+    setTimeout(()=>{ g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.05); o.stop(ctx.currentTime + 0.06); }, 450);
   }catch(e){}
 }
 async function notifyDone(){
-  // fallback beep
-  try { beep(); } catch(e){}
+  beep();
   if("Notification" in window && Notification.permission==="granted"){
     new Notification("IronAmbra • Timer finito ✅", { body: "Recupero completato." });
   }
+}
+
+/* ✅ Fix: Caricamento librerie (Chart e PDF) con retry, così lo Storico NON ti dice “devi essere online” se sei online */
+const libStatus = document.getElementById("libStatus");
+function setLibStatus(msg){ libStatus.textContent = msg; }
+
+function loadScriptOnce(src){
+  return new Promise((resolve, reject)=>{
+    // già presente?
+    if([...document.scripts].some(s => s.src === src)) return resolve(true);
+    const s=document.createElement("script");
+    s.src = src;
+    s.defer = true;
+    s.onload = ()=>resolve(true);
+    s.onerror = ()=>reject(new Error("load failed"));
+    document.head.appendChild(s);
+  });
+}
+async function ensureChart(){
+  if(typeof Chart !== "undefined") return true;
+  setLibStatus("Sto caricando Chart.js…");
+  try{
+    await loadScriptOnce(LIBS.chart);
+    setLibStatus("Chart.js pronto ✅");
+    return true;
+  }catch(e){
+    setLibStatus("Non riesco a caricare Chart.js. Riprova (rete) o premi “Aggiorna app”.");
+    return false;
+  }
+}
+async function ensurePDF(){
+  if(window.jspdf) return true;
+  try{ await loadScriptOnce(LIBS.pdf); return true; }catch(e){ return false; }
 }
 
 /* Storico / Grafici */
@@ -590,7 +762,6 @@ let chart=null;
 const chartExercise = document.getElementById("chartExercise");
 const sessionList = document.getElementById("sessionList");
 const statsLine = document.getElementById("statsLine");
-const chartWarn = document.getElementById("chartWarn");
 
 function allExerciseNames(){
   const set = new Set();
@@ -599,7 +770,8 @@ function allExerciseNames(){
   return [...set].filter(Boolean).sort((a,b)=>a.localeCompare(b));
 }
 
-function renderStorico(){
+async function renderStorico(){
+  // dropdown esercizi
   const names = allExerciseNames();
   chartExercise.innerHTML="";
   names.forEach(n=>{
@@ -609,19 +781,22 @@ function renderStorico(){
   });
   if(names.length) chartExercise.value = chartExercise.value || names[0];
 
+  // stats
   const completed = state.sessions.length;
   const last = state.sessions.at(-1);
   statsLine.textContent = `Sessioni: ${completed} • Ultima: ${last? fmtDate(last.finishedAt):"—"}`;
 
+  // list sessioni (✅ badge note)
   sessionList.innerHTML="";
   state.sessions.slice().reverse().forEach(s=>{
     const c=document.createElement("div");
     c.className="exercise";
     const doneCount = s.exercises.filter(e=>e.done).length;
+    const noteBadge = s.hasNotes ? `<span class="badge note">📝 note</span>` : "";
     c.innerHTML = `
       <div class="row">
         <div>
-          <div style="font-weight:800">${s.planName}</div>
+          <div style="font-weight:950">${s.planName} ${noteBadge}</div>
           <div class="muted">${fmtDate(s.finishedAt)} • Completati: ${doneCount}/${s.exercises.length} • kcal: ${s.calories ?? "—"}</div>
         </div>
         <button class="btn danger">Elimina</button>
@@ -635,19 +810,17 @@ function renderStorico(){
     sessionList.appendChild(c);
   });
 
-  drawChart(chartExercise.value);
+  // grafico
+  const ok = await ensureChart();
+  if(ok) drawChart(chartExercise.value);
 }
 
-chartExercise.addEventListener("change", ()=> drawChart(chartExercise.value));
+chartExercise.addEventListener("change", async ()=> {
+  const ok = await ensureChart();
+  if(ok) drawChart(chartExercise.value);
+});
 
 function drawChart(exName){
-  // se Chart.js non è caricato, mostra warning
-  if(typeof Chart === "undefined"){
-    chartWarn.style.display = "block";
-    return;
-  }
-  chartWarn.style.display = "none";
-
   const points=[];
   state.sessions.forEach(s=>{
     const found = s.exercises.find(e=>e.name===exName && e.kg!=="" && !isNaN(Number(e.kg)));
@@ -664,14 +837,15 @@ function drawChart(exName){
       datasets:[{
         label:`Kg - ${exName}`,
         data: points.map(p=>p.y),
-        borderColor:"#7c5cff",
-        backgroundColor:"rgba(124,92,255,.25)",
+        borderColor:"#6C63FF",
+        backgroundColor:"rgba(108,99,255,.18)",
         tension:.25,
         fill:true
       }]
     },
     options:{ responsive:true, scales:{ y:{ beginAtZero:false } } }
   });
+  setLibStatus("Storico pronto ✅");
 }
 
 /* Import */
@@ -732,11 +906,9 @@ function exportCSV(){
 }
 
 document.getElementById("exportPdfBtn").addEventListener("click", exportPDF);
-function exportPDF(){
-  if(!window.jspdf){
-    toast("PDF non disponibile offline al primo avvio");
-    return;
-  }
+async function exportPDF(){
+  const ok = await ensurePDF();
+  if(!ok){ toast("PDF non disponibile: premi “Aggiorna app” e riprova"); return; }
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
   doc.setFontSize(14);
@@ -749,9 +921,11 @@ function exportPDF(){
     doc.text("Nessuna sessione salvata.", 14, y);
   }else{
     sessions.forEach(s=>{
-      doc.text(`${fmtDate(s.finishedAt)} • ${s.planName} • kcal: ${s.calories ?? "—"}`, 14, y); y+=6;
+      doc.text(`${fmtDate(s.finishedAt)} • ${s.planName} • kcal: ${s.calories ?? "—"}${s.hasNotes ? " • NOTE" : ""}`, 14, y);
+      y+=6;
       s.exercises.slice(0, 10).forEach(e=>{
-        doc.text(`- ${e.name}: kg ${e.kg || "—"} • serie ${e.setsDone}/${e.targetSets} • reps ${e.repsDone || "—"}`, 16, y);
+        const n = (e.notes||"").trim() ? " • 📝" : "";
+        doc.text(`- ${e.name}: kg ${e.kg || "—"} • serie ${e.setsDone}/${e.targetSets} • reps ${e.repsDone || "—"}${n}`, 16, y);
         y+=5;
         if(y>280){ doc.addPage(); y=16; }
       });
@@ -785,14 +959,34 @@ document.getElementById("resetAll").addEventListener("click", ()=>{
   }
 });
 
+/* ✅ Fix cache: rimuove service worker vecchi così spariscono bug/vecchie versioni */
+document.getElementById("hardRefresh").addEventListener("click", async ()=>{
+  try{
+    if("serviceWorker" in navigator){
+      const regs = await navigator.serviceWorker.getRegistrations();
+      await Promise.all(regs.map(r => r.unregister()));
+    }
+    // prova a “bustare” cache
+    localStorage.setItem("ironambra_hardrefresh", String(Date.now()));
+    location.href = location.pathname + "?v=" + Date.now();
+  }catch(e){
+    location.reload();
+  }
+});
+
 /* Install hint */
 document.getElementById("installHintBtn").addEventListener("click", ()=>{
-  alert("Installazione iPhone: apri in Safari → Condividi → Aggiungi a Home.\n\nPer offline: apri IronAmbra almeno 1 volta con internet.");
+  alert("Installazione iPhone: Safari → Condividi → Aggiungi a Home.\n\nSe qualcosa sembra vecchio: Impostazioni → Aggiorna app (fix cache).");
 });
 
 /* Service worker */
 if("serviceWorker" in navigator){
-  window.addEventListener("load", ()=> navigator.serviceWorker.register("./sw.js").catch(()=>{}));
+  window.addEventListener("load", async ()=>{
+    try{
+      const reg = await navigator.serviceWorker.register("./sw.js");
+      reg.update?.();
+    }catch(e){}
+  });
 }
 
 /* Toast */
@@ -803,10 +997,10 @@ function toast(msg){
   d.style.bottom="18px";
   d.style.left="50%";
   d.style.transform="translateX(-50%)";
-  d.style.background="rgba(0,0,0,.75)";
+  d.style.background="rgba(16,24,40,.86)";
   d.style.color="white";
   d.style.padding="10px 14px";
-  d.style.borderRadius="14px";
+  d.style.borderRadius="999px";
   d.style.zIndex="99";
   d.style.fontSize="13px";
   document.body.appendChild(d);
@@ -816,6 +1010,7 @@ function toast(msg){
 /* Init */
 renderHome();
 setTimer(90);
+setLibStatus("Apri Storico: carico librerie automaticamente ✅");
 </script>
 </body>
 </html>
