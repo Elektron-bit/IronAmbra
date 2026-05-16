@@ -3,8 +3,8 @@
   "short_name": "IronAmbra",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#0b1220",
-  "theme_color": "#0b1220",
-  "description": "Workout tracker offline: mobilità, day1-3, timer, storico, grafici, export.",
+  "background_color": "#EEF1EE",
+  "theme_color": "#A3B18A",
+  "description": "Workout tracker iPhone-first: mobilità, day1-3, timer, storico, export.",
   "icons": []
 }
