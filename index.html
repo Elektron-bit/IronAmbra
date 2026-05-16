@@ -1,0 +1,801 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="theme-color" content="#0b1220" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>IronAmbra</title>
+
+  ./manifest.webmanifest
+
+  <style>
+    :root{
+      --bg:#0b1220; --card:#111a2e; --muted:#9fb0d0; --text:#eaf0ff;
+      --accent:#7c5cff; --ok:#16a34a; --danger:#ef4444;
+      --border:rgba(255,255,255,.10);
+    }
+    @media (prefers-color-scheme: light){
+      :root{ --bg:#f6f7fb; --card:#ffffff; --muted:#5b6b86; --text:#0b1220; --border:rgba(0,0,0,.10); }
+    }
+    body{ margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,Arial; background:var(--bg); color:var(--text); }
+    header{ position:sticky; top:0; z-index:10; padding:14px 16px; border-bottom:1px solid var(--border);
+      background:rgba(11,18,32,.75); backdrop-filter: blur(10px); }
+    h1{ margin:0; font-size:18px; letter-spacing:.2px; display:flex; align-items:center; gap:10px; }
+    .pill{ font-size:12px; padding:4px 8px; border:1px solid var(--border); border-radius:999px; color:var(--muted); }
+    main{ padding:16px; max-width:980px; margin:0 auto; }
+    .tabs{ display:flex; gap:8px; flex-wrap:wrap; margin:12px 0 16px; }
+    .tab{ padding:10px 12px; border:1px solid var(--border); border-radius:12px; background:transparent; color:var(--text); }
+    .tab.active{ background:var(--card); border-color:rgba(124,92,255,.55); }
+    .grid{ display:grid; gap:12px; }
+    .card{ background:var(--card); border:1px solid var(--border); border-radius:16px; padding:14px; }
+    .row{ display:flex; gap:10px; align-items:center; justify-content:space-between; flex-wrap:wrap; }
+    .muted{ color:var(--muted); font-size:13px; }
+    .btn{ border:1px solid var(--border); background:transparent; color:var(--text); padding:10px 12px; border-radius:12px; }
+    .btn.primary{ background:var(--accent); border-color:rgba(124,92,255,.7); }
+    .btn.ok{ background:var(--ok); border-color:rgba(22,163,74,.7); }
+    .btn.danger{ background:var(--danger); border-color:rgba(239,68,68,.7); }
+    input, select, textarea{
+      width:100%; padding:10px 10px; border-radius:12px;
+      border:1px solid var(--border); background:transparent; color:var(--text);
+      outline:none;
+    }
+    textarea{ min-height:110px; }
+    label{ font-size:12px; color:var(--muted); display:block; margin-bottom:6px; }
+    .exercise{ padding:12px; border-radius:14px; border:1px solid var(--border); background:rgba(0,0,0,.06); }
+    .exercise h3{ margin:0 0 8px; font-size:15px; }
+    .exercise small{ color:var(--muted); }
+    .cols{ display:grid; grid-template-columns: 1fr 1fr; gap:10px; }
+    .cols3{ display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px; }
+    .check{ display:flex; gap:10px; align-items:center; }
+    .check input{ width:20px; height:20px; }
+    .timerBig{ font-size:38px; font-weight:800; letter-spacing:.5px; }
+    canvas{ width:100% !important; height:220px !important; }
+    .spacer{ height:8px; }
+    .hint{ padding:10px 12px; border-radius:14px; border:1px dashed var(--border); color:var(--muted); font-size:13px; }
+  </style>
+</head>
+
+<body>
+<header>
+  <div class="row">
+    <h1>IronAmbra <span class="pill">offline • PWA</span></h1>
+    <button class="btn" id="installHintBtn" title="Installazione">📲</button>
+  </div>
+</header>
+
+<main>
+  <div class="tabs">
+    <button class="tab active" data-tab="home">Home</button>
+    <button class="tab" data-tab="workout">Workout</button>
+    <button class="tab" data-tab="timer">Timer</button>
+    <button class="tab" data-tab="storico">Storico</button>
+    <button class="tab" data-tab="importa">Importa</button>
+    <button class="tab" data-tab="impostazioni">Impostazioni</button>
+  </div>
+
+  <!-- HOME -->
+  <section id="home" class="grid">
+    <div class="card">
+      <div class="row">
+        <div>
+          <div class="muted">Oggi</div>
+          <div style="font-size:18px;font-weight:800" id="todayLabel">Mobilità + Day 1</div>
+          <div class="muted">Scegli cosa fare e premi “Inizia workout”.</div>
+        </div>
+        <div style="min-width:180px">
+          <label>Allenamento di oggi</label>
+          <select id="todaySelect"></select>
+        </div>
+      </div>
+      <div class="spacer"></div>
+      <div class="row">
+        <button class="btn primary" id="startBtn">▶️ Inizia workout</button>
+        <button class="btn" id="quickMobBtn">🧘 Solo Mobilità</button>
+        <button class="btn" id="quickDayBtn">🏋️ Solo Day</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="row">
+        <div>
+          <div style="font-weight:800">Ultimo allenamento</div>
+          <div class="muted" id="lastWorkout">Nessuno ancora</div>
+        </div>
+        <button class="btn" id="exportBtn">⬇️ Export CSV</button>
+      </div>
+      <div class="spacer"></div>
+      <div class="hint">
+        Import da foto (facile): Foto → seleziona testo (Testo Live) → Copia → Incolla in “Importa”.
+      </div>
+    </div>
+  </section>
+
+  <!-- WORKOUT -->
+  <section id="workout" class="grid" style="display:none">
+    <div class="card">
+      <div class="row">
+        <div>
+          <div class="muted">Sessione attiva</div>
+          <div style="font-size:18px;font-weight:900" id="sessionTitle">—</div>
+          <div class="muted" id="sessionMeta">—</div>
+        </div>
+        <div class="row" style="gap:8px">
+          <button class="btn" id="saveSessionBtn">💾 Salva</button>
+          <button class="btn ok" id="finishSessionBtn">✅ Completa</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="row">
+        <div style="min-width:200px">
+          <label>Recupero automatico</label>
+          <select id="restPreset">
+            <option value="60">60s</option>
+            <option value="90" selected>90s</option>
+            <option value="120">120s</option>
+          </select>
+        </div>
+        <div style="min-width:200px">
+          <label>Peso corporeo (kcal)</label>
+          <input id="bodyweight" type="number" step="0.1" placeholder="es. 60" />
+        </div>
+        <div style="min-width:200px">
+          <label>Durata workout (min)</label>
+          <input id="durationMin" type="number" step="1" placeholder="es. 45" />
+        </div>
+      </div>
+      <div class="spacer"></div>
+      <div class="muted">Calorie stimate (MET): è una stima, non un dato clinico.</div>
+    </div>
+
+    <div id="exerciseList" class="grid"></div>
+  </section>
+
+  <!-- TIMER -->
+  <section id="timer" class="grid" style="display:none">
+    <div class="card">
+      <div class="row">
+        <div>
+          <div class="muted">Timer recupero</div>
+          <div class="timerBig" id="timerDisplay">01:30</div>
+          <div class="muted" id="timerHint">Preset: 90s</div>
+        </div>
+        <div class="row" style="gap:8px">
+          <button class="btn primary" id="timerStart">Start</button>
+          <button class="btn" id="timerPause">Pausa</button>
+          <button class="btn danger" id="timerReset">Reset</button>
+        </div>
+      </div>
+      <div class="spacer"></div>
+      <div class="row">
+        <button class="btn" data-set="60">60s</button>
+        <button class="btn" data-set="90">90s</button>
+        <button class="btn" data-set="120">120s</button>
+      </div>
+      <div class="spacer"></div>
+      <div class="hint">Su iPhone: suono + notifica (se permessa). Vibrazione web non sempre garantita.</div>
+    </div>
+  </section>
+
+  <!-- STORICO -->
+  <section id="storico" class="grid" style="display:none">
+    <div class="card">
+      <div class="row">
+        <div>
+          <div style="font-weight:900;font-size:18px">Storico & Progressi</div>
+          <div class="muted">Grafico carichi + sessioni completate.</div>
+        </div>
+        <button class="btn" id="exportPdfBtn">🧾 Export PDF</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <label>Esercizio (grafico carichi)</label>
+      <select id="chartExercise"></select>
+      <div class="spacer"></div>
+      <canvas id="weightChart"></canvas>
+      <div class="muted" id="chartWarn" style="margin-top:8px; display:none;">
+        Grafico non disponibile offline al primo avvio: apri IronAmbra una volta con internet.
+      </div>
+    </div>
+
+    <div class="card">
+      <div style="font-weight:800">Allenamenti completati</div>
+      <div class="muted" id="statsLine">—</div>
+    </div>
+
+    <div class="card">
+      <div style="font-weight:800">Lista sessioni</div>
+      <div class="spacer"></div>
+      <div id="sessionList" class="grid"></div>
+    </div>
+  </section>
+
+  <!-- IMPORTA -->
+  <section id="importa" class="grid" style="display:none">
+    <div class="card">
+      <div style="font-weight:900;font-size:18px">Importa scheda (da testo)</div>
+      <div class="muted">Formato: “Squat trx 4x10” — “Affondo trx 4x6-6”.</div>
+      <div class="spacer"></div>
+      <label>Nome workout</label>
+      <input id="importName" placeholder="es. Day 2" />
+      <div class="spacer"></div>
+      <label>Testo incollato</label>
+      <textarea id="importText" placeholder="Esempio:
+Squat trx 4x10
+Affondo trx 4x6-6
+Push up 3x8"></textarea>
+      <div class="spacer"></div>
+      <button class="btn primary" id="importBtn">✨ Crea workout</button>
+    </div>
+  </section>
+
+  <!-- IMPOSTAZIONI -->
+  <section id="impostazioni" class="grid" style="display:none">
+    <div class="card">
+      <div style="font-weight:900;font-size:18px">Impostazioni</div>
+      <div class="spacer"></div>
+      <label>MET per calcolo calorie (forza)</label>
+      <select id="metSelect">
+        <option value="3.5">Leggero (3.5)</option>
+        <option value="5.0" selected>Moderato (5.0)</option>
+        <option value="6.0">Intenso (6.0)</option>
+      </select>
+      <div class="spacer"></div>
+      <button class="btn" id="requestNotif">🔔 Abilita notifiche timer</button>
+      <div class="spacer"></div>
+      <button class="btn danger" id="resetAll">🗑️ Reset totale (cancella dati)</button>
+      <div class="spacer"></div>
+      <div class="hint">Dati salvati solo sul tuo iPhone (localStorage). Cloud/login = fase 2.</div>
+    </div>
+  </section>
+</main>
+
+<!-- Librerie (servono per grafici e PDF) -->
+https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.jsscript>
+https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.jsscript>
+
+<script>
+/* -----------------------
+   IronAmbra - Offline PWA
+   ----------------------- */
+
+const STORAGE_KEY = "ironambra_v1";
+const state = loadState() ?? seedState();
+
+function seedState(){
+  return {
+    settings: { met: 5.0, notifications:false },
+    workouts: {
+      "Mobilità": [
+        mkEx("90-90", 2, "10"),
+        mkEx("Cat cow", 2, "10"),
+        mkEx("Su e giù con braccia al muro", 2, "10"),
+        mkEx("Circonduzioni gambe avanti-indietro", 2, "10-10"),
+        mkEx("Circonduzioni con bastone avanti-dietro", 2, "10-10"),
+      ],
+      "Day 1": [
+        mkEx("Squat trx", 4, "10"),
+        mkEx("Affondo trx", 4, "6-6"),
+        mkEx("Leg extension", 3, "10"),
+        mkEx("Australian trx", 4, "8"),
+        mkEx("Push up", 3, "8"),
+        mkEx("Curl manubri", 3, "10"),
+        mkEx("Plank-crunch", 3, "20\"-20"),
+      ],
+      "Day 2": [],
+      "Day 3": []
+    },
+    sessions: [],
+    activeSession: null
+  };
+}
+
+function mkEx(name, sets, reps){
+  return { id: cryptoId(), name, targetSets: sets, targetReps: reps, rest: 90 };
+}
+function cryptoId(){
+  return (crypto?.randomUUID?.() ?? ("id_"+Math.random().toString(16).slice(2)));
+}
+function saveState(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+function loadState(){ try{ return JSON.parse(localStorage.getItem(STORAGE_KEY)); }catch(e){ return null; } }
+
+function fmtDate(ts){
+  const d=new Date(ts);
+  return d.toLocaleString("it-IT",{weekday:"short", day:"2-digit", month:"short", hour:"2-digit", minute:"2-digit"});
+}
+function calcCalories(met, kg, minutes){
+  if(!kg || !minutes) return null;
+  return Math.round((met * 3.5 * kg / 200) * minutes);
+}
+
+/* Tabs */
+const tabs = document.querySelectorAll(".tab");
+tabs.forEach(b=>b.addEventListener("click", ()=>{
+  tabs.forEach(x=>x.classList.remove("active"));
+  b.classList.add("active");
+  const t=b.dataset.tab;
+  document.querySelectorAll("main section").forEach(s=>s.style.display="none");
+  document.getElementById(t).style.display="grid";
+  if(t==="storico") renderStorico();
+  if(t==="home") renderHome();
+}));
+
+function openTab(name){
+  document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("active", x.dataset.tab===name));
+  document.querySelectorAll("main section").forEach(s=>s.style.display="none");
+  document.getElementById(name).style.display="grid";
+}
+
+/* Home */
+const todaySelect = document.getElementById("todaySelect");
+const todayLabel = document.getElementById("todayLabel");
+const lastWorkout = document.getElementById("lastWorkout");
+
+function renderHome(){
+  todaySelect.innerHTML="";
+  Object.keys(state.workouts).forEach(k=>{
+    const opt=document.createElement("option");
+    opt.value=k; opt.textContent=k;
+    todaySelect.appendChild(opt);
+  });
+  todaySelect.value = "Day 1";
+  todayLabel.textContent = "Mobilità + " + todaySelect.value;
+
+  const last = state.sessions.at(-1);
+  lastWorkout.textContent = last ? `${last.planName} • ${fmtDate(last.finishedAt)} • kcal: ${last.calories ?? "—"}` : "Nessuno ancora";
+  saveState();
+}
+todaySelect.addEventListener("change", ()=> todayLabel.textContent = "Mobilità + " + todaySelect.value);
+
+document.getElementById("startBtn").addEventListener("click", ()=> startSession("Mobilità + " + todaySelect.value, ["Mobilità", todaySelect.value]));
+document.getElementById("quickMobBtn").addEventListener("click", ()=> startSession("Mobilità", ["Mobilità"]));
+document.getElementById("quickDayBtn").addEventListener("click", ()=> startSession(todaySelect.value, [todaySelect.value]));
+
+/* Workout */
+const sessionTitle = document.getElementById("sessionTitle");
+const sessionMeta = document.getElementById("sessionMeta");
+const exerciseList = document.getElementById("exerciseList");
+const restPreset = document.getElementById("restPreset");
+const bodyweightEl = document.getElementById("bodyweight");
+const durationMinEl = document.getElementById("durationMin");
+
+function startSession(title, planKeys){
+  const ex = planKeys.flatMap(k => (state.workouts[k] ?? []).map(e => ({
+    ...JSON.parse(JSON.stringify(e)),
+    kg: "",
+    setsDone: 0,
+    repsDone: "",
+    notes: "",
+    done:false
+  })));
+  state.activeSession = {
+    id: cryptoId(),
+    planName: title,
+    planKeys,
+    startedAt: Date.now(),
+    finishedAt: null,
+    exercises: ex,
+    restDefault: Number(restPreset.value || 90),
+    bodyweight: Number(bodyweightEl.value || 0),
+    durationMin: Number(durationMinEl.value || 0),
+    calories: null
+  };
+  saveState();
+  openTab("workout");
+  renderWorkout();
+}
+
+function renderWorkout(){
+  const s = state.activeSession;
+  if(!s){ sessionTitle.textContent="Nessuna sessione"; return; }
+
+  sessionTitle.textContent = s.planName;
+  sessionMeta.textContent = `Inizio: ${fmtDate(s.startedAt)} • Esercizi: ${s.exercises.length}`;
+  restPreset.value = s.restDefault ?? 90;
+  bodyweightEl.value = s.bodyweight || "";
+  durationMinEl.value = s.durationMin || "";
+
+  exerciseList.innerHTML="";
+  s.exercises.forEach((e)=>{
+    const card = document.createElement("div");
+    card.className="exercise";
+    card.innerHTML = `
+      <div class="row">
+        <div>
+          <h3>${e.name}</h3>
+          <small>Target: ${e.targetSets} × ${e.targetReps} • Recupero: ${e.rest || s.restDefault || 90}s</small>
+        </div>
+        <div class="check">
+          <input type="checkbox" ${e.done?"checked":""} aria-label="Completato" />
+          <span class="muted">Completato</span>
+        </div>
+      </div>
+
+      <div class="spacer"></div>
+      <div class="cols3">
+        <div>
+          <label>Kg usati</label>
+          <input inputmode="decimal" placeholder="es. 12.5" value="${e.kg ?? ""}" />
+        </div>
+        <div>
+          <label>Serie completate</label>
+          <input inputmode="numeric" placeholder="es. 3" value="${e.setsDone ?? 0}" />
+        </div>
+        <div>
+          <label>Ripetizioni</label>
+          <input placeholder="es. 10 / 8-8" value="${e.repsDone ?? ""}" />
+        </div>
+      </div>
+
+      <div class="spacer"></div>
+      <div class="cols">
+        <div>
+          <label>Note</label>
+          <input placeholder="sensazioni, tecnica..." value="${(e.notes ?? "").replaceAll('"','&quot;')}" />
+        </div>
+        <div>
+          <label>Timer recupero</label>
+          <div class="row">
+            <button class="btn" data-rest="${e.rest || s.restDefault || 90}">⏱️ Avvia ${e.rest || s.restDefault || 90}s</button>
+            <button class="btn" data-plusrest="1">+30s</button>
+          </div>
+        </div>
+      </div>
+    `;
+
+    const chk = card.querySelector('input[type="checkbox"]');
+    const inputs = card.querySelectorAll('input:not([type="checkbox"])');
+    const startRestBtn = card.querySelector('button[data-rest]');
+    const plusRestBtn = card.querySelector('button[data-plusrest]');
+
+    chk.addEventListener("change", ()=>{ e.done = chk.checked; saveState(); });
+    inputs[0].addEventListener("input", ()=>{ e.kg = inputs[0].value; saveState(); });
+    inputs[1].addEventListener("input", ()=>{ e.setsDone = Number(inputs[1].value||0); saveState(); });
+    inputs[2].addEventListener("input", ()=>{ e.repsDone = inputs[2].value; saveState(); });
+    inputs[3].addEventListener("input", ()=>{ e.notes = inputs[3].value; saveState(); });
+
+    startRestBtn.addEventListener("click", ()=>{
+      setTimer(Number(startRestBtn.dataset.rest||90));
+      openTab("timer");
+    });
+    plusRestBtn.addEventListener("click", ()=>{
+      const base = Number(e.rest || s.restDefault || 90);
+      e.rest = base + 30;
+      saveState();
+      renderWorkout();
+    });
+
+    exerciseList.appendChild(card);
+  });
+
+  saveState();
+}
+
+restPreset.addEventListener("change", ()=>{
+  if(state.activeSession){ state.activeSession.restDefault = Number(restPreset.value); saveState(); renderWorkout(); }
+});
+bodyweightEl.addEventListener("input", ()=>{ if(state.activeSession){ state.activeSession.bodyweight = Number(bodyweightEl.value||0); saveState(); }});
+durationMinEl.addEventListener("input", ()=>{ if(state.activeSession){ state.activeSession.durationMin = Number(durationMinEl.value||0); saveState(); }});
+
+document.getElementById("saveSessionBtn").addEventListener("click", ()=>{ saveState(); toast("Salvato ✅"); });
+
+document.getElementById("finishSessionBtn").addEventListener("click", ()=>{
+  const s = state.activeSession;
+  if(!s) return;
+  s.finishedAt = Date.now();
+  const met = Number(state.settings.met || 5.0);
+  s.calories = calcCalories(met, s.bodyweight, s.durationMin);
+  state.sessions.push(s);
+  state.activeSession = null;
+  saveState();
+  toast("Allenamento completato ✅");
+  openTab("home");
+  renderHome();
+});
+
+/* Timer */
+let timer = { total: 90, left: 90, running: false, tId:null };
+const timerDisplay = document.getElementById("timerDisplay");
+const timerHint = document.getElementById("timerHint");
+
+function setTimer(sec){
+  timer.total = sec; timer.left = sec; timer.running=false;
+  renderTimer();
+  timerHint.textContent = `Preset: ${sec}s`;
+}
+function renderTimer(){
+  const m = String(Math.floor(timer.left/60)).padStart(2,"0");
+  const s = String(timer.left%60).padStart(2,"0");
+  timerDisplay.textContent = `${m}:${s}`;
+}
+function tick(){
+  if(!timer.running) return;
+  timer.left -= 1;
+  renderTimer();
+  if(timer.left<=0){
+    stopTimer();
+    notifyDone();
+  }
+}
+function startTimer(){
+  if(timer.running) return;
+  timer.running = true;
+  timer.tId = setInterval(tick, 1000);
+}
+function stopTimer(){
+  timer.running=false;
+  if(timer.tId) clearInterval(timer.tId);
+  timer.tId=null;
+}
+function resetTimer(){
+  stopTimer();
+  timer.left=timer.total;
+  renderTimer();
+}
+
+document.getElementById("timerStart").addEventListener("click", startTimer);
+document.getElementById("timerPause").addEventListener("click", stopTimer);
+document.getElementById("timerReset").addEventListener("click", resetTimer);
+document.querySelectorAll('#timer button[data-set]').forEach(b=>{
+  b.addEventListener("click", ()=> setTimer(Number(b.dataset.set)));
+});
+
+function beep(){
+  try{
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+    o.type="sine"; o.frequency.value=880;
+    o.connect(g); g.connect(ctx.destination);
+    g.gain.setValueAtTime(0.001, ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.25, ctx.currentTime + 0.02);
+    o.start();
+    setTimeout(()=>{ g.gain.exponentialRampToToValueAtTime?.(0.001, ctx.currentTime + 0.05); o.stop(ctx.currentTime + 0.06); }, 450);
+  }catch(e){}
+}
+async function notifyDone(){
+  // fallback beep
+  try { beep(); } catch(e){}
+  if("Notification" in window && Notification.permission==="granted"){
+    new Notification("IronAmbra • Timer finito ✅", { body: "Recupero completato." });
+  }
+}
+
+/* Storico / Grafici */
+let chart=null;
+const chartExercise = document.getElementById("chartExercise");
+const sessionList = document.getElementById("sessionList");
+const statsLine = document.getElementById("statsLine");
+const chartWarn = document.getElementById("chartWarn");
+
+function allExerciseNames(){
+  const set = new Set();
+  Object.values(state.workouts).flat().forEach(e=>set.add(e.name));
+  state.sessions.forEach(s=>s.exercises.forEach(e=>set.add(e.name)));
+  return [...set].filter(Boolean).sort((a,b)=>a.localeCompare(b));
+}
+
+function renderStorico(){
+  const names = allExerciseNames();
+  chartExercise.innerHTML="";
+  names.forEach(n=>{
+    const opt=document.createElement("option");
+    opt.value=n; opt.textContent=n;
+    chartExercise.appendChild(opt);
+  });
+  if(names.length) chartExercise.value = chartExercise.value || names[0];
+
+  const completed = state.sessions.length;
+  const last = state.sessions.at(-1);
+  statsLine.textContent = `Sessioni: ${completed} • Ultima: ${last? fmtDate(last.finishedAt):"—"}`;
+
+  sessionList.innerHTML="";
+  state.sessions.slice().reverse().forEach(s=>{
+    const c=document.createElement("div");
+    c.className="exercise";
+    const doneCount = s.exercises.filter(e=>e.done).length;
+    c.innerHTML = `
+      <div class="row">
+        <div>
+          <div style="font-weight:800">${s.planName}</div>
+          <div class="muted">${fmtDate(s.finishedAt)} • Completati: ${doneCount}/${s.exercises.length} • kcal: ${s.calories ?? "—"}</div>
+        </div>
+        <button class="btn danger">Elimina</button>
+      </div>
+    `;
+    c.querySelector("button").addEventListener("click", ()=>{
+      state.sessions = state.sessions.filter(x=>x.id!==s.id);
+      saveState();
+      renderStorico();
+    });
+    sessionList.appendChild(c);
+  });
+
+  drawChart(chartExercise.value);
+}
+
+chartExercise.addEventListener("change", ()=> drawChart(chartExercise.value));
+
+function drawChart(exName){
+  // se Chart.js non è caricato, mostra warning
+  if(typeof Chart === "undefined"){
+    chartWarn.style.display = "block";
+    return;
+  }
+  chartWarn.style.display = "none";
+
+  const points=[];
+  state.sessions.forEach(s=>{
+    const found = s.exercises.find(e=>e.name===exName && e.kg!=="" && !isNaN(Number(e.kg)));
+    if(found) points.push({ x: new Date(s.finishedAt), y: Number(found.kg) });
+  });
+  points.sort((a,b)=>a.x-b.x);
+
+  const ctx=document.getElementById("weightChart");
+  if(chart) chart.destroy();
+  chart = new Chart(ctx, {
+    type:"line",
+    data:{
+      labels: points.map(p=>p.x.toLocaleDateString("it-IT")),
+      datasets:[{
+        label:`Kg - ${exName}`,
+        data: points.map(p=>p.y),
+        borderColor:"#7c5cff",
+        backgroundColor:"rgba(124,92,255,.25)",
+        tension:.25,
+        fill:true
+      }]
+    },
+    options:{ responsive:true, scales:{ y:{ beginAtZero:false } } }
+  });
+}
+
+/* Import */
+document.getElementById("importBtn").addEventListener("click", ()=>{
+  const name = (document.getElementById("importName").value || "").trim() || "Workout importato";
+  const text = (document.getElementById("importText").value || "").trim();
+  if(!text){ toast("Incolla del testo 🙂"); return; }
+
+  const lines = text.split(/\n+/).map(x=>x.trim()).filter(Boolean);
+  const ex=[];
+  for(const line of lines){
+    const m = line.match(/^(.*?)(\d+)\s*[xX]\s*([\d"’′\-–—]+)\s*$/);
+    if(m){
+      const rawName = m[1].trim().replace(/[-–—]+$/,"").trim();
+      const sets = Number(m[2]);
+      const reps = m[3].trim();
+      ex.push(mkEx(rawName, sets, reps));
+    }else{
+      ex.push(mkEx(line, 3, "10"));
+    }
+  }
+
+  state.workouts[name] = ex;
+  saveState();
+  toast(`Creato "${name}" ✅`);
+  document.getElementById("importName").value="";
+  document.getElementById("importText").value="";
+  openTab("home"); renderHome();
+});
+
+/* Export CSV / PDF */
+document.getElementById("exportBtn").addEventListener("click", exportCSV);
+function exportCSV(){
+  const rows = [["data","workout","esercizio","kg","serie","reps","note","completato","kcal_sessione"]];
+  state.sessions.forEach(s=>{
+    s.exercises.forEach(e=>{
+      rows.push([
+        new Date(s.finishedAt).toISOString(),
+        s.planName,
+        e.name,
+        e.kg,
+        e.setsDone,
+        e.repsDone,
+        (e.notes||"").replaceAll("\n"," "),
+        e.done ? "1" : "0",
+        s.calories ?? ""
+      ]);
+    });
+  });
+  const csv = rows.map(r=>r.map(v=> `"${String(v??"").replaceAll('"','""')}"`).join(",")).join("\n");
+  const blob = new Blob([csv], {type:"text/csv;charset=utf-8"});
+  const url = URL.createObjectURL(blob);
+  const a=document.createElement("a");
+  a.href=url;
+  a.download="ironambra_export.csv";
+  a.click();
+  setTimeout(()=>URL.revokeObjectURL(url), 1500);
+}
+
+document.getElementById("exportPdfBtn").addEventListener("click", exportPDF);
+function exportPDF(){
+  if(!window.jspdf){
+    toast("PDF non disponibile offline al primo avvio");
+    return;
+  }
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  doc.setFontSize(14);
+  doc.text("IronAmbra - Report", 14, 16);
+  doc.setFontSize(10);
+
+  let y=26;
+  const sessions = state.sessions.slice().reverse().slice(0, 10);
+  if(!sessions.length){
+    doc.text("Nessuna sessione salvata.", 14, y);
+  }else{
+    sessions.forEach(s=>{
+      doc.text(`${fmtDate(s.finishedAt)} • ${s.planName} • kcal: ${s.calories ?? "—"}`, 14, y); y+=6;
+      s.exercises.slice(0, 10).forEach(e=>{
+        doc.text(`- ${e.name}: kg ${e.kg || "—"} • serie ${e.setsDone}/${e.targetSets} • reps ${e.repsDone || "—"}`, 16, y);
+        y+=5;
+        if(y>280){ doc.addPage(); y=16; }
+      });
+      y+=4;
+      if(y>280){ doc.addPage(); y=16; }
+    });
+  }
+  doc.save("ironambra_report.pdf");
+}
+
+/* Settings */
+document.getElementById("metSelect").value = String(state.settings.met || 5.0);
+document.getElementById("metSelect").addEventListener("change", (e)=>{
+  state.settings.met = Number(e.target.value);
+  saveState();
+  toast("MET salvato ✅");
+});
+
+document.getElementById("requestNotif").addEventListener("click", async ()=>{
+  if(!("Notification" in window)){ toast("Notifiche non supportate"); return; }
+  const perm = await Notification.requestPermission();
+  state.settings.notifications = perm==="granted";
+  saveState();
+  toast(perm==="granted" ? "Notifiche abilitate ✅" : "Notifiche non abilitate");
+});
+
+document.getElementById("resetAll").addEventListener("click", ()=>{
+  if(confirm("Sicura? Cancello tutti i dati.")){
+    localStorage.removeItem(STORAGE_KEY);
+    location.reload();
+  }
+});
+
+/* Install hint */
+document.getElementById("installHintBtn").addEventListener("click", ()=>{
+  alert("Installazione iPhone: apri in Safari → Condividi → Aggiungi a Home.\n\nPer offline: apri IronAmbra almeno 1 volta con internet.");
+});
+
+/* Service worker */
+if("serviceWorker" in navigator){
+  window.addEventListener("load", ()=> navigator.serviceWorker.register("./sw.js").catch(()=>{}));
+}
+
+/* Toast */
+function toast(msg){
+  const d=document.createElement("div");
+  d.textContent=msg;
+  d.style.position="fixed";
+  d.style.bottom="18px";
+  d.style.left="50%";
+  d.style.transform="translateX(-50%)";
+  d.style.background="rgba(0,0,0,.75)";
+  d.style.color="white";
+  d.style.padding="10px 14px";
+  d.style.borderRadius="14px";
+  d.style.zIndex="99";
+  d.style.fontSize="13px";
+  document.body.appendChild(d);
+  setTimeout(()=>d.remove(), 1400);
+}
+
+/* Init */
+renderHome();
+setTimer(90);
+</script>
+</body>
+</html>
