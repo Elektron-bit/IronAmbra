@@ -1,0 +1,10 @@
+{
+  "name": "IronAmbra",
+  "short_name": "IronAmbra",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#0b1220",
+  "theme_color": "#0b1220",
+  "description": "Workout tracker offline: mobilità, day1-3, timer, storico, grafici, export.",
+  "icons": []
+}
